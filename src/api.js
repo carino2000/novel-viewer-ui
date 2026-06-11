@@ -1,4 +1,4 @@
-const BASE = 'http://localhost:8080'
+const BASE = 'http://59.13.19.232:8080'
 
 export async function apiFetch(path, options = {}) {
   const res = await fetch(`${BASE}${path}`, {

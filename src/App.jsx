@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { BookOpen, User, ChevronRight, Loader2 } from 'lucide-react'
+import { BookOpen, User, ChevronRight, Loader2, Sparkles } from 'lucide-react'
 import NovelViewer from './components/NovelViewer'
 import SidePanel from './components/SidePanel'
 import { apiFetch } from './api'
@@ -11,6 +11,8 @@ export default function App() {
   const [novelInfo, setNovelInfo] = useState(null)
   const [progress, setProgress] = useState(null)
   const [selecting, setSelecting] = useState(false)
+  const [mobileView, setMobileView] = useState('reader')
+  const [navVisible, setNavVisible] = useState(true)
 
   useEffect(() => {
     apiFetch('/api/novel')
@@ -61,7 +63,7 @@ export default function App() {
           </div>
 
           {/* 소설 목록 */}
-          <div className="flex flex-col gap-3 w-96">
+          <div className="flex flex-col gap-3 w-full max-w-sm px-4 sm:px-0">
             {novels.length === 0 ? (
               <p className="text-white/30 text-sm text-center py-8">소설 데이터가 없습니다.</p>
             ) : (
@@ -102,21 +104,59 @@ export default function App() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-[#0c0c15]">
-      <div className="w-[58%] h-full overflow-hidden border-r border-white/[0.06]">
-        <NovelViewer
-          novelId={novelId}
-          novelInfo={novelInfo}
-          progress={progress}
-          onProgressChange={setProgress}
-        />
+      {/* 소설 뷰어 */}
+      <div className={`
+        overflow-hidden flex flex-col
+        w-full md:w-[58%] md:border-r md:border-white/6
+        ${mobileView === 'reader' ? 'flex' : 'hidden'} md:flex
+      `}>
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <NovelViewer
+            novelId={novelId}
+            novelInfo={novelInfo}
+            progress={progress}
+            onProgressChange={setProgress}
+            onNavVisibilityChange={setNavVisible}
+          />
+        </div>
       </div>
-      <div className="w-[42%] h-full overflow-hidden">
-        <SidePanel
-          novelId={novelId}
-          progress={progress}
-          onProgressChange={setProgress}
-        />
+
+      {/* 사이드 패널 */}
+      <div className={`
+        overflow-hidden flex flex-col
+        w-full md:w-[42%]
+        ${mobileView === 'panel' ? 'flex' : 'hidden'} md:flex
+      `}>
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <SidePanel
+            novelId={novelId}
+            progress={progress}
+            onProgressChange={setProgress}
+          />
+        </div>
       </div>
+
+      {/* 모바일 하단 탭 네비게이션 */}
+      <nav className={`md:hidden fixed bottom-0 inset-x-0 z-50 flex h-14 bg-[#0c0c15]/95 backdrop-blur-md border-t border-white/8 transition-transform duration-300 ${navVisible ? 'translate-y-0' : 'translate-y-full'}`}>
+        <button
+          onClick={() => setMobileView('reader')}
+          className={`flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors ${
+            mobileView === 'reader' ? 'text-indigo-400' : 'text-white/30'
+          }`}
+        >
+          <BookOpen className="w-5 h-5" />
+          <span className="text-[10px] font-medium">읽기</span>
+        </button>
+        <button
+          onClick={() => setMobileView('panel')}
+          className={`flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors ${
+            mobileView === 'panel' ? 'text-indigo-400' : 'text-white/30'
+          }`}
+        >
+          <Sparkles className="w-5 h-5" />
+          <span className="text-[10px] font-medium">분석</span>
+        </button>
+      </nav>
     </div>
   )
 }

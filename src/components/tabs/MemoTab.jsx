@@ -6,10 +6,10 @@ function MemoCard({ memo, onEdit, onDelete }) {
   const [confirm, setConfirm] = useState(false)
 
   return (
-    <div className="bg-[#16161f] border border-white/6 rounded-xl p-3.5 group">
-      <p className="text-white/65 text-sm leading-relaxed whitespace-pre-line">{memo.content}</p>
-      <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-white/4">
-        <span className="text-[10px] text-white/20">
+    <div className="bg-[#16161f] border border-white/6 rounded-xl p-4 group">
+      <p className="text-white/70 text-base leading-relaxed whitespace-pre-line">{memo.content}</p>
+      <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/4">
+        <span className="text-xs text-white/20">
           {new Date(memo.updatedAt).toLocaleDateString('ko-KR', {
             month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
           })}
@@ -17,33 +17,33 @@ function MemoCard({ memo, onEdit, onDelete }) {
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
           {confirm ? (
             <>
-              <span className="text-[10px] text-white/40 mr-1">삭제?</span>
+              <span className="text-xs text-white/40 mr-1">삭제?</span>
               <button
                 onClick={() => onDelete(memo.memoId)}
-                className="w-6 h-6 flex items-center justify-center rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
+                className="w-7 h-7 flex items-center justify-center rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"
               >
-                <Check className="w-3 h-3" />
+                <Check className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setConfirm(false)}
-                className="w-6 h-6 flex items-center justify-center rounded-lg text-white/30 hover:bg-white/5 transition-colors"
+                className="w-7 h-7 flex items-center justify-center rounded-lg text-white/30 hover:bg-white/5 transition-colors"
               >
-                <X className="w-3 h-3" />
+                <X className="w-3.5 h-3.5" />
               </button>
             </>
           ) : (
             <>
               <button
                 onClick={() => onEdit(memo)}
-                className="w-6 h-6 flex items-center justify-center rounded-lg text-white/30 hover:text-white hover:bg-white/5 transition-colors"
+                className="w-7 h-7 flex items-center justify-center rounded-lg text-white/30 hover:text-white hover:bg-white/5 transition-colors"
               >
-                <Pencil className="w-3 h-3" />
+                <Pencil className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => setConfirm(true)}
-                className="w-6 h-6 flex items-center justify-center rounded-lg text-white/30 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                className="w-7 h-7 flex items-center justify-center rounded-lg text-white/30 hover:text-red-400 hover:bg-red-500/10 transition-colors"
               >
-                <Trash2 className="w-3 h-3" />
+                <Trash2 className="w-3.5 h-3.5" />
               </button>
             </>
           )}
@@ -67,19 +67,19 @@ function EditModal({ memo, onSave, onClose }) {
   return (
     <div className="absolute inset-0 z-10 bg-[#0c0c15]/90 backdrop-blur-sm flex flex-col p-4 gap-3">
       <div className="flex items-center justify-between shrink-0">
-        <span className="text-white text-sm font-medium">
+        <span className="text-white text-base font-medium">
           {memo ? '메모 수정' : '새 메모'}
         </span>
         <button
           onClick={onClose}
-          className="w-7 h-7 flex items-center justify-center rounded-lg text-white/40 hover:text-white hover:bg-white/5 transition-colors"
+          className="w-8 h-8 flex items-center justify-center rounded-lg text-white/40 hover:text-white hover:bg-white/5 transition-colors"
         >
-          <X className="w-4 h-4" />
+          <X className="w-5 h-5" />
         </button>
       </div>
       <textarea
         autoFocus
-        className="flex-1 w-full bg-[#16161f] border border-white/8 focus:border-indigo-500/50 rounded-xl p-3.5 text-white/80 text-sm leading-7 resize-none outline-none placeholder:text-white/20 transition-colors"
+        className="flex-1 w-full bg-[#16161f] border border-white/8 focus:border-indigo-500/50 rounded-xl p-4 text-white/80 text-base leading-7 resize-none outline-none placeholder:text-white/20 transition-colors"
         placeholder="자유롭게 메모를 남겨보세요."
         value={content}
         onChange={(e) => setContent(e.target.value)}
@@ -87,7 +87,7 @@ function EditModal({ memo, onSave, onClose }) {
       <button
         onClick={handleSave}
         disabled={saving || !content.trim()}
-        className="w-full py-2.5 rounded-xl text-sm font-medium bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white transition-colors flex items-center justify-center gap-2 shrink-0"
+        className="w-full py-3 rounded-xl text-base font-medium bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white transition-colors flex items-center justify-center gap-2 shrink-0"
       >
         {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
         저장
@@ -99,7 +99,7 @@ function EditModal({ memo, onSave, onClose }) {
 export default function MemoTab({ novelId, currentEpisode }) {
   const [memos, setMemos] = useState([])
   const [loading, setLoading] = useState(true)
-  const [editTarget, setEditTarget] = useState(undefined) // undefined=닫힘, null=새 메모, object=수정
+  const [editTarget, setEditTarget] = useState(undefined)
 
   useEffect(() => {
     if (!novelId) return
@@ -144,18 +144,18 @@ export default function MemoTab({ novelId, currentEpisode }) {
       {/* 헤더 */}
       <div className="flex items-center justify-between px-4 py-3 shrink-0">
         <div>
-          <span className="text-white/60 text-sm font-medium">{currentEpisode}화 메모</span>
+          <span className="text-white/60 text-base font-medium">{currentEpisode}화 메모</span>
           {memos.length > 0 && (
-            <span className="ml-2 text-[10px] text-white/25 bg-white/5 px-1.5 py-0.5 rounded-full">
+            <span className="ml-2 text-xs text-white/25 bg-white/5 px-1.5 py-0.5 rounded-full">
               {memos.length}
             </span>
           )}
         </div>
         <button
           onClick={() => setEditTarget(null)}
-          className="flex items-center gap-1.5 text-xs text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 px-2.5 py-1.5 rounded-lg transition-colors"
+          className="flex items-center gap-1.5 text-sm text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 px-3 py-2 rounded-lg transition-colors"
         >
-          <Plus className="w-3.5 h-3.5" />
+          <Plus className="w-4 h-4" />
           새 메모
         </button>
       </div>
@@ -164,17 +164,17 @@ export default function MemoTab({ novelId, currentEpisode }) {
       <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-2">
         {loading ? (
           <div className="flex items-center justify-center h-full gap-2 text-white/30">
-            <Loader2 className="w-4 h-4 animate-spin" />
-            <span className="text-sm">불러오는 중</span>
+            <Loader2 className="w-5 h-5 animate-spin" />
+            <span className="text-base">불러오는 중</span>
           </div>
         ) : memos.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-3 text-white/25">
-            <p className="text-sm">저장된 메모가 없습니다.</p>
+            <p className="text-base">저장된 메모가 없습니다.</p>
             <button
               onClick={() => setEditTarget(null)}
-              className="flex items-center gap-1.5 text-xs text-indigo-400 bg-indigo-500/10 px-3 py-1.5 rounded-lg hover:bg-indigo-500/20 transition-colors"
+              className="flex items-center gap-1.5 text-sm text-indigo-400 bg-indigo-500/10 px-4 py-2 rounded-lg hover:bg-indigo-500/20 transition-colors"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-4 h-4" />
               첫 메모 작성
             </button>
           </div>
@@ -190,7 +190,6 @@ export default function MemoTab({ novelId, currentEpisode }) {
         )}
       </div>
 
-      {/* 편집 모달 (overlay) */}
       {editTarget !== undefined && (
         <EditModal
           memo={editTarget}

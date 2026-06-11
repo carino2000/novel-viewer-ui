@@ -2,6 +2,49 @@
 
 ---
 
+## 2026-06-11
+
+### 한 작업
+
+**모바일 반응형 + PWA**
+- `App.jsx` — 하단 탭 네비게이션 (읽기/분석 전환), `mobileView` state
+- `vite.config.js` — VitePWA 플러그인 등록, `host: '0.0.0.0'` (외부 접근)
+- `index.html` — viewport-fit=cover, iOS PWA 메타태그, apple-touch-icon
+- `pwa-assets.config.js` — 커스텀 프리셋, apple 아이콘 배경 `#0c0c15`로 흰 테두리 제거
+- PWA 아이콘 재생성 (pwa-64/192/512, maskable-icon-512, apple-touch-icon-180)
+
+**백엔드 연결 주소 변경**
+- `src/api.js` — base URL `http://59.13.199.232:8080` (외부 서버)
+- 프론트 서버 포트 3000, `0.0.0.0` 바인딩 → `http://59.13.199.232:3000/`
+
+**CharacterTab 기능 개선**
+- 검색 API 응답 파싱: 그룹 객체 `{ "이름": [...], "클래스": [...] }` 형태 처리
+- 랭크 컬러 시스템: B → A → A+ → A++ → A+++ → S → S+ → EX Zero → EX → EX+
+- 기본 상태 UI: 전체 목록 대신 검색 안내 + 카테고리 태그 칩
+- CharacterDetail overflow 수정 (`min-h-0` 체인)
+- `SidePanel.jsx` — AI 업데이트 버튼 아래 "마지막 업데이트: N화" 표시
+
+**소설 뷰어 스크롤 오버레이 (핵심 수정)**
+- `NovelViewer.jsx` 전면 재작성: `absolute inset-0` 스크롤 영역 + 헤더/푸터 절대 오버레이
+- `paddingTop` 동적 변경 문제 해결: 에피소드 제목을 헤더에서 스크롤 콘텐츠로 이동 → headerHeight 안정화
+- 최종 방식: paddingTop 완전 제거 → 헤더/푸터가 글자 위에 진짜로 올라타는 방식
+- 스크롤 다운 → UI 숨김, 스크롤 업 or 탭 → UI 표시
+- `App.jsx` 스페이서 div 제거 (iOS Safari 컨테이너 높이 변경 시 scrollTop 재계산 방지)
+- `SidePanel.jsx` — `pb-14 md:pb-0` 정적 하단 여백
+
+**글씨 크기 & UI 크기**
+- 소설 본문: `text-[20px] font-medium`
+- NovelViewer 헤더/푸터 버튼 전반 확대 (`w-10 h-10`, `text-base`, `py-3` 등)
+- 분석 탭 전체 글씨 한 단계씩 확대 (CharacterTab, SummaryTab, MemoTab, RelationTab)
+- SidePanel 탭 네비 `text-sm`, AI 버튼 `text-base`
+
+### 다음 할 일
+1. iOS 홈화면 추가 후 아이콘/스크롤 동작 최종 확인
+2. 소설 뷰어 읽기 경험 추가 개선 (필요 시)
+3. 기타 버그 픽스
+
+---
+
 ## 2026-06-10
 
 ### 한 작업

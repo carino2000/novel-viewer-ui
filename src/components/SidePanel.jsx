@@ -36,14 +36,14 @@ export default function SidePanel({ novelId, progress, onProgressChange }) {
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#0f0f18]">
+    <div className="flex flex-col h-full bg-[#0f0f18] pb-14 md:pb-0">
       {/* 탭 네비게이션 */}
       <div className="flex gap-1 p-2 border-b border-white/6 shrink-0 bg-[#0c0c15]">
         {TABS.map(({ id, label, Icon }) => (
           <button
             key={id}
             onClick={() => setActiveTab(id)}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-xs font-medium transition-all duration-200 ${
+            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
               activeTab === id
                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
                 : 'text-white/40 hover:text-white/70 hover:bg-white/5'
@@ -61,7 +61,7 @@ export default function SidePanel({ novelId, progress, onProgressChange }) {
           <button
             onClick={handleAiUpdate}
             disabled={aiLoading}
-            className="w-full py-2.5 rounded-xl text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 disabled:cursor-not-allowed
+            className="w-full py-3 rounded-xl text-base font-medium transition-all duration-200 flex items-center justify-center gap-2 disabled:cursor-not-allowed
               bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500
               disabled:from-indigo-800 disabled:to-violet-800 disabled:text-white/40
               text-white shadow-lg shadow-indigo-500/20"
@@ -87,7 +87,7 @@ export default function SidePanel({ novelId, progress, onProgressChange }) {
       )}
 
       {/* 탭 컨텐츠 */}
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1 overflow-hidden min-h-0">
         {activeTab === 'character' && (
           <CharacterTab novelId={novelId} aiVersion={aiVersion} />
         )}
