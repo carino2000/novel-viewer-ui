@@ -53,7 +53,7 @@ export default function RelationTab({ relations }) {
       </div>
 
       {/* 관계 목록 */}
-      <div className="flex-1 overflow-y-auto px-4 pb-4 space-y-2">
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 pb-4 space-y-2">
         {!relations ? (
           <div className="flex flex-col items-center justify-center h-full text-white/25 gap-2">
             <p className="text-base">아직 관계 정보가 없습니다.</p>
@@ -91,7 +91,7 @@ export default function RelationTab({ relations }) {
                   <span className="text-white text-base font-semibold">{rel.to}</span>
 
                   <span
-                    className={`ml-auto text-xs px-2.5 py-1 rounded-full font-medium border shrink-0 ${getRelationStyle(rel.relation)}`}
+                    className={`ml-auto text-sm px-3 py-1 rounded-full font-medium border shrink-0 ${getRelationStyle(rel.relation)}`}
                   >
                     {rel.relation}
                   </span>

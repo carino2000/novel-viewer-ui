@@ -9,7 +9,7 @@ function MemoCard({ memo, onEdit, onDelete }) {
     <div className="bg-[#16161f] border border-white/6 rounded-xl p-4 group">
       <p className="text-white/70 text-base leading-relaxed whitespace-pre-line">{memo.content}</p>
       <div className="flex items-center justify-between mt-3 pt-3 border-t border-white/4">
-        <span className="text-xs text-white/20">
+        <span className="text-sm text-white/20">
           {new Date(memo.updatedAt).toLocaleDateString('ko-KR', {
             month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
           })}
@@ -153,7 +153,7 @@ export default function MemoTab({ novelId, currentEpisode }) {
         </div>
         <button
           onClick={() => setEditTarget(null)}
-          className="flex items-center gap-1.5 text-sm text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 px-3 py-2 rounded-lg transition-colors"
+          className="flex items-center gap-1.5 text-base text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 px-3 py-2 rounded-lg transition-colors"
         >
           <Plus className="w-4 h-4" />
           새 메모
@@ -172,7 +172,7 @@ export default function MemoTab({ novelId, currentEpisode }) {
             <p className="text-base">저장된 메모가 없습니다.</p>
             <button
               onClick={() => setEditTarget(null)}
-              className="flex items-center gap-1.5 text-sm text-indigo-400 bg-indigo-500/10 px-4 py-2 rounded-lg hover:bg-indigo-500/20 transition-colors"
+              className="flex items-center gap-1.5 text-base text-indigo-400 bg-indigo-500/10 px-4 py-2 rounded-lg hover:bg-indigo-500/20 transition-colors"
             >
               <Plus className="w-4 h-4" />
               첫 메모 작성

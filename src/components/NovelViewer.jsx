@@ -13,6 +13,12 @@ export default function NovelViewer({ novelId, novelInfo, progress, onProgressCh
   const shouldRestoreScroll = useRef(false)
   const scrollTimer = useRef(null)
   const lastScrollY = useRef(0)
+  const overscrollRef = useRef(0)
+  const atBottomTouchY = useRef(null)
+  const navigatingRef = useRef(false)
+  const hasVibratedRef = useRef(false)
+  const [overscrollProgress, setOverscrollProgress] = useState(0)
+  const OVERSCROLL_THRESHOLD = 80
 
   const currentEpisode = progress?.currentEpisode ?? 1
   const totalEpisodes = novelInfo?.totalEpisodes ?? 1
@@ -105,7 +111,52 @@ export default function NovelViewer({ novelId, novelInfo, progress, onProgressCh
     }, 1000)
   }
 
+  const handleTouchStart = () => {
+    atBottomTouchY.current = null
+    hasVibratedRef.current = false
+  }
+
+  const handleTouchMove = (e) => {
+    if (navigatingRef.current || !episodeData?.hasNext) return
+    const el = scrollRef.current
+    if (!el) return
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight < 5
+    if (!atBottom) {
+      atBottomTouchY.current = null
+      if (overscrollRef.current > 0) { overscrollRef.current = 0; setOverscrollProgress(0) }
+      return
+    }
+    if (atBottomTouchY.current === null) atBottomTouchY.current = e.touches[0].clientY
+    const delta = Math.max(0, atBottomTouchY.current - e.touches[0].clientY)
+    overscrollRef.current = delta
+    const progress = Math.min(delta / OVERSCROLL_THRESHOLD, 1)
+    setOverscrollProgress(progress)
+    if (progress >= 1 && !hasVibratedRef.current) {
+      navigator.vibrate?.([15])
+      hasVibratedRef.current = true
+    }
+  }
+
+  const handleTouchEnd = async () => {
+    if (navigatingRef.current) return
+    if (overscrollRef.current >= OVERSCROLL_THRESHOLD && episodeData?.hasNext) {
+      navigatingRef.current = true
+      navigator.vibrate?.([30, 30, 50])
+      overscrollRef.current = 0
+      setOverscrollProgress(0)
+      await navigate(currentEpisode + 1)
+      navigatingRef.current = false
+    } else {
+      overscrollRef.current = 0
+      setOverscrollProgress(0)
+    }
+    atBottomTouchY.current = null
+    hasVibratedRef.current = false
+  }
+
   const navigate = async (newEpisode) => {
+    overscrollRef.current = 0
+    setOverscrollProgress(0)
     setUiVisible(true)
     onNavVisibilityChange?.(true)
     try {
@@ -191,6 +242,9 @@ export default function NovelViewer({ novelId, novelInfo, progress, onProgressCh
         className="absolute inset-0 overflow-y-auto"
         onScroll={handleScroll}
         onClick={handleTap}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         {loading ? (
           <div className="flex items-center justify-center h-full gap-2 text-[#a09080]">
@@ -233,13 +287,40 @@ export default function NovelViewer({ novelId, novelInfo, progress, onProgressCh
                 <p
                   key={i}
                   ref={(el) => { lineRefs.current[i] = el }}
-                  className="text-[#2e2416] text-[20px] font-medium leading-[2.15] mb-0.5 break-keep"
+                  className="text-[#2e2416] text-[20px] font-bold leading-[2.15] mb-0.5 break-keep"
                   style={{ fontFamily: "'Noto Serif KR', serif", wordBreak: 'keep-all' }}
                 >
                   {line}
                 </p>
               )
             )}
+
+            {/* 화 전환 인디케이터 */}
+            <div className="flex flex-col items-center gap-3 pt-10 pb-6">
+              {episodeData?.hasNext ? (
+                <>
+                  <p
+                    className="text-sm text-[#b0a090] select-none"
+                    style={{ fontFamily: "'Pretendard', sans-serif" }}
+                  >
+                    {overscrollProgress >= 1 ? '손을 떼면 다음화로 이동합니다' : '━━━  다음화로 계속  ━━━'}
+                  </p>
+                  <div className="w-36 h-1 bg-[#e8e0d0] rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-[#8b7355] rounded-full transition-[width] duration-100"
+                      style={{ width: `${overscrollProgress * 100}%` }}
+                    />
+                  </div>
+                </>
+              ) : (
+                <p
+                  className="text-sm text-[#b0a090] select-none"
+                  style={{ fontFamily: "'Pretendard', sans-serif" }}
+                >
+                  ━━━  완결  ━━━
+                </p>
+              )}
+            </div>
           </div>
         )}
       </div>

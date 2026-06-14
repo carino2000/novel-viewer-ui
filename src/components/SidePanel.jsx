@@ -13,16 +13,21 @@ const TABS = [
   { id: 'relation', label: '관계도', Icon: GitBranch },
 ]
 
-export default function SidePanel({ novelId, progress, onProgressChange }) {
+export default function SidePanel({ novelId, progress, onProgressChange, onAiLoadingChange }) {
   const [activeTab, setActiveTab] = useState('character')
   const [aiLoading, setAiLoading] = useState(false)
   const [aiVersion, setAiVersion] = useState(0)
 
   const currentEpisode = progress?.currentEpisode ?? 1
 
+  const setAiLoadingBoth = (val) => {
+    setAiLoading(val)
+    onAiLoadingChange?.(val)
+  }
+
   const handleAiUpdate = async () => {
     if (aiLoading) return
-    setAiLoading(true)
+    setAiLoadingBoth(true)
     try {
       await apiFetch(`/api/ai/update?novelId=${novelId}`, { method: 'POST' })
       const newProgress = await apiFetch(`/api/reading-progress?novelId=${novelId}`)
@@ -31,25 +36,25 @@ export default function SidePanel({ novelId, progress, onProgressChange }) {
     } catch (e) {
       alert(`AI 업데이트 실패: ${e.message}`)
     } finally {
-      setAiLoading(false)
+      setAiLoadingBoth(false)
     }
   }
 
   return (
-    <div className="flex flex-col h-full bg-[#0f0f18] pb-14 md:pb-0">
+    <div className="flex flex-col h-full bg-[#0f0f18] pb-20 md:pb-0">
       {/* 탭 네비게이션 */}
       <div className="flex gap-1 p-2 border-b border-white/6 shrink-0 bg-[#0c0c15]">
         {TABS.map(({ id, label, Icon }) => (
           <button
             key={id}
             onClick={() => setActiveTab(id)}
-            className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+            className={`flex-1 flex items-center justify-center gap-1.5 py-3 rounded-xl text-base font-medium transition-all duration-200 ${
               activeTab === id
                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-500/20'
                 : 'text-white/40 hover:text-white/70 hover:bg-white/5'
             }`}
           >
-            <Icon className="w-3.5 h-3.5" />
+            <Icon className="w-4 h-4" />
             {label}
           </button>
         ))}
@@ -94,7 +99,6 @@ export default function SidePanel({ novelId, progress, onProgressChange }) {
         {activeTab === 'summary' && (
           <SummaryTab
             novelId={novelId}
-            currentEpisode={currentEpisode}
             aiVersion={aiVersion}
           />
         )}

@@ -13,6 +13,7 @@ export default function App() {
   const [selecting, setSelecting] = useState(false)
   const [mobileView, setMobileView] = useState('reader')
   const [navVisible, setNavVisible] = useState(true)
+  const [aiLoading, setAiLoading] = useState(false)
 
   useEffect(() => {
     apiFetch('/api/novel')
@@ -103,7 +104,7 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#0c0c15]">
+    <div className="flex h-full overflow-hidden bg-[#0c0c15]">
       {/* 소설 뷰어 */}
       <div className={`
         overflow-hidden flex flex-col
@@ -132,29 +133,36 @@ export default function App() {
             novelId={novelId}
             progress={progress}
             onProgressChange={setProgress}
+            onAiLoadingChange={setAiLoading}
           />
         </div>
       </div>
 
       {/* 모바일 하단 탭 네비게이션 */}
-      <nav className={`md:hidden fixed bottom-0 inset-x-0 z-50 flex h-14 bg-[#0c0c15]/95 backdrop-blur-md border-t border-white/8 transition-transform duration-300 ${navVisible ? 'translate-y-0' : 'translate-y-full'}`}>
+      <nav className={`md:hidden fixed bottom-0 inset-x-0 z-50 flex h-20 bg-[#0c0c15]/95 backdrop-blur-md border-t border-white/8 transition-transform duration-300 ${navVisible ? 'translate-y-0' : 'translate-y-full'}`}>
         <button
           onClick={() => setMobileView('reader')}
-          className={`flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors ${
+          className={`flex-1 flex flex-col items-center justify-center gap-2 transition-colors ${
             mobileView === 'reader' ? 'text-indigo-400' : 'text-white/30'
           }`}
         >
-          <BookOpen className="w-5 h-5" />
-          <span className="text-[10px] font-medium">읽기</span>
+          <BookOpen className="w-7 h-7" />
+          <span className="text-base font-medium">읽기</span>
         </button>
         <button
           onClick={() => setMobileView('panel')}
-          className={`flex-1 flex flex-col items-center justify-center gap-0.5 transition-colors ${
+          className={`flex-1 relative flex flex-col items-center justify-center gap-2 transition-colors ${
             mobileView === 'panel' ? 'text-indigo-400' : 'text-white/30'
           }`}
         >
-          <Sparkles className="w-5 h-5" />
-          <span className="text-[10px] font-medium">분석</span>
+          {aiLoading && mobileView === 'reader' && (
+            <div className="absolute -top-9 left-1/2 -translate-x-1/2 flex items-center gap-1.5 bg-indigo-600 text-white text-xs px-3 py-1.5 rounded-full whitespace-nowrap shadow-lg shadow-indigo-500/40">
+              <Loader2 className="w-3 h-3 animate-spin" />
+              <span>AI 분석 중</span>
+            </div>
+          )}
+          <Sparkles className="w-7 h-7" />
+          <span className="text-base font-medium">분석</span>
         </button>
       </nav>
     </div>
