@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Users, FileText, StickyNote, GitBranch, Sparkles, Loader2 } from 'lucide-react'
 import CharacterTab from './tabs/CharacterTab'
 import SummaryTab from './tabs/SummaryTab'
@@ -13,10 +13,14 @@ const TABS = [
   { id: 'relation', label: '관계도', Icon: GitBranch },
 ]
 
-export default function SidePanel({ novelId, progress, onProgressChange, onAiLoadingChange }) {
+export default function SidePanel({ novelId, progress, onProgressChange, onAiLoadingChange, resetSignal }) {
   const [activeTab, setActiveTab] = useState('character')
   const [aiLoading, setAiLoading] = useState(false)
   const [aiVersion, setAiVersion] = useState(0)
+
+  useEffect(() => {
+    setActiveTab('character')
+  }, [resetSignal])
 
   const currentEpisode = progress?.currentEpisode ?? 1
 

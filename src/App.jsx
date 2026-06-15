@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { BookOpen, User, ChevronRight, Loader2, Sparkles } from 'lucide-react'
 import NovelViewer from './components/NovelViewer'
 import SidePanel from './components/SidePanel'
@@ -14,6 +14,34 @@ export default function App() {
   const [mobileView, setMobileView] = useState('reader')
   const [navVisible, setNavVisible] = useState(true)
   const [aiLoading, setAiLoading] = useState(false)
+  const [panelResetCount, setPanelResetCount] = useState(0)
+  const swipeStartX = useRef(null)
+  const swipeStartY = useRef(null)
+
+  const handleMobileViewChange = (view) => {
+    if (view === 'panel' && mobileView === 'reader') {
+      setPanelResetCount(c => c + 1)
+    }
+    setMobileView(view)
+    setNavVisible(true)
+  }
+
+  const handleSwipeTouchStart = (e) => {
+    if (window.innerWidth >= 768 || mobileView !== 'panel') return
+    swipeStartX.current = e.touches[0].clientX
+    swipeStartY.current = e.touches[0].clientY
+  }
+
+  const handleSwipeTouchEnd = (e) => {
+    if (window.innerWidth >= 768) return
+    if (swipeStartX.current === null) return
+    const dx = e.changedTouches[0].clientX - swipeStartX.current
+    const dy = e.changedTouches[0].clientY - swipeStartY.current
+    swipeStartX.current = null
+    swipeStartY.current = null
+    if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 1.5) return
+    if (dx > 0) handleMobileViewChange('reader')
+  }
 
   useEffect(() => {
     apiFetch('/api/novel')
@@ -104,13 +132,13 @@ export default function App() {
   }
 
   return (
-    <div className="flex h-full overflow-hidden bg-[#0c0c15]">
-      {/* 소설 뷰어 */}
-      <div className={`
-        overflow-hidden flex flex-col
-        w-full md:w-[58%] md:border-r md:border-white/6
-        ${mobileView === 'reader' ? 'flex' : 'hidden'} md:flex
-      `}>
+    <div
+      className="flex h-full overflow-hidden bg-[#0c0c15]"
+      onTouchStart={handleSwipeTouchStart}
+      onTouchEnd={handleSwipeTouchEnd}
+    >
+      {/* 소설 뷰어 - 모바일에서도 항상 렌더링 */}
+      <div className="flex flex-col w-full md:w-[58%] md:border-r md:border-white/6 overflow-hidden">
         <div className="flex-1 min-h-0 overflow-hidden">
           <NovelViewer
             novelId={novelId}
@@ -122,26 +150,28 @@ export default function App() {
         </div>
       </div>
 
-      {/* 사이드 패널 */}
-      <div className={`
-        overflow-hidden flex flex-col
-        w-full md:w-[42%]
-        ${mobileView === 'panel' ? 'flex' : 'hidden'} md:flex
-      `}>
-        <div className="flex-1 min-h-0 overflow-hidden">
-          <SidePanel
-            novelId={novelId}
-            progress={progress}
-            onProgressChange={setProgress}
-            onAiLoadingChange={setAiLoading}
-          />
-        </div>
+      {/* 사이드 패널 - 모바일에서 absolute 오버레이, 우측 슬라이드 트랜지션 */}
+      <div
+        className={`
+          absolute inset-0 z-30 md:relative md:inset-auto md:z-auto
+          flex flex-col md:w-[42%] overflow-hidden
+          transition-transform duration-300 ease-in-out
+          ${mobileView === 'panel' ? 'translate-x-0' : 'translate-x-full md:translate-x-0'}
+        `}
+      >
+        <SidePanel
+          novelId={novelId}
+          progress={progress}
+          onProgressChange={setProgress}
+          onAiLoadingChange={setAiLoading}
+          resetSignal={panelResetCount}
+        />
       </div>
 
       {/* 모바일 하단 탭 네비게이션 */}
-      <nav className={`md:hidden fixed bottom-0 inset-x-0 z-50 flex h-20 bg-[#0c0c15]/95 backdrop-blur-md border-t border-white/8 transition-transform duration-300 ${navVisible ? 'translate-y-0' : 'translate-y-full'}`}>
+      <nav className={`md:hidden fixed bottom-0 inset-x-0 z-50 flex h-20 bg-[#0c0c15]/95 backdrop-blur-md transition-transform duration-300 ${navVisible ? 'translate-y-0' : 'translate-y-full'}`}>
         <button
-          onClick={() => setMobileView('reader')}
+          onClick={() => handleMobileViewChange('reader')}
           className={`flex-1 flex flex-col items-center justify-center gap-2 transition-colors ${
             mobileView === 'reader' ? 'text-indigo-400' : 'text-white/30'
           }`}
@@ -150,7 +180,7 @@ export default function App() {
           <span className="text-base font-medium">읽기</span>
         </button>
         <button
-          onClick={() => setMobileView('panel')}
+          onClick={() => handleMobileViewChange('panel')}
           className={`flex-1 relative flex flex-col items-center justify-center gap-2 transition-colors ${
             mobileView === 'panel' ? 'text-indigo-400' : 'text-white/30'
           }`}

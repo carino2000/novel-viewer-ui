@@ -216,7 +216,7 @@ export default function NovelViewer({ novelId, novelInfo, progress, onProgressCh
       </div>
 
       {/* ── 읽기 진행도 바 (항상 최상단 고정) ── */}
-      <div className="absolute top-0 inset-x-0 z-30 h-1 bg-[#e8e0d0]/20">
+      <div className="absolute top-0 inset-x-0 z-30 h-0.75 bg-[#e8e0d0]/20">
         <div
           className="h-full bg-[#c8824a] transition-[width] duration-150"
           style={{ width: `${readProgress}%` }}
