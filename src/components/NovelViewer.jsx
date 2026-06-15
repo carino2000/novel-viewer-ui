@@ -18,6 +18,7 @@ export default function NovelViewer({ novelId, novelInfo, progress, onProgressCh
   const navigatingRef = useRef(false)
   const hasVibratedRef = useRef(false)
   const [overscrollProgress, setOverscrollProgress] = useState(0)
+  const [readProgress, setReadProgress] = useState(0)
   const OVERSCROLL_THRESHOLD = 80
 
   const currentEpisode = progress?.currentEpisode ?? 1
@@ -62,15 +63,17 @@ export default function NovelViewer({ novelId, novelInfo, progress, onProgressCh
   const handleTap = (e) => {
     if (window.innerWidth >= 768) return
     if (e.target.closest('button, a, input')) return
-    if (!uiVisible) {
-      setUiVisible(true)
-      onNavVisibilityChange?.(true)
-    }
+    const next = !uiVisible
+    setUiVisible(next)
+    onNavVisibilityChange?.(next)
   }
 
   const handleScroll = () => {
     const container = scrollRef.current
     if (!container) return
+
+    const scrollable = container.scrollHeight - container.clientHeight
+    if (scrollable > 0) setReadProgress((container.scrollTop / scrollable) * 100)
 
     if (window.innerWidth < 768) {
       const currentY = container.scrollTop
@@ -210,6 +213,14 @@ export default function NovelViewer({ novelId, novelInfo, progress, onProgressCh
             </button>
           </div>
         </div>
+      </div>
+
+      {/* ── 읽기 진행도 바 (항상 최상단 고정) ── */}
+      <div className="absolute top-0 inset-x-0 z-30 h-1 bg-[#e8e0d0]/20">
+        <div
+          className="h-full bg-[#c8824a] transition-[width] duration-150"
+          style={{ width: `${readProgress}%` }}
+        />
       </div>
 
       {/* ── 하단 버튼 오버레이 ── */}
